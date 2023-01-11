@@ -169,7 +169,7 @@ int main(int agc, void **argv){
         printf("malloc failed\n");
         return 1;
     }
-    f1 = fopen("dico2.txt", "rb");
+    f1 = fopen("test.txt", "rb");
     if(f1 == NULL){
         printf("failed to open file1\n");
         return 1;
@@ -178,13 +178,22 @@ int main(int agc, void **argv){
     t[0] = t1; t[1] = t2; t[2] = t3; t[3] = t4;
     int len = read_line(f1, str);
     while(len > 0){
-        // check applying 1 t 
+        // check without applying any Ts
+        if(SHA256((u_char *) str, strlen(str), hash) == NULL){
+            printf("error sha256\n");
+            return 1;
+        }
+        if(witch_hash(hash, new) == 0){
+            break;
+        }
+        // check applying 1 T 
         for(int i = 0; i < MAX_Ts; i++){
             if(t[i](str, new, len - 1) != 0){
                 printf("Error t%d\n", i + 1);
                 return 1;
             }
-            if(SHA256((u_char *) new, strlen(new), hash) == 0){
+            //printf("t%d %s\n", i + 1, new);
+            if(SHA256((u_char *) new, strlen(new), hash) == NULL){
                 printf("Erreur Update\n");
                 return 1;
             }
@@ -192,7 +201,7 @@ int main(int agc, void **argv){
                 break;
             }
         }
-        // check applying 2 t
+        // check applying 2 T
         for(int i = 0; i < MAX_Ts; i++){
             if(t[i](str, new, len - 1) != 0){
                 printf("Error t%d\n", i + 1);
@@ -204,8 +213,8 @@ int main(int agc, void **argv){
                         printf("Error t%d\n", i + 1);
                         return 1;
                     }
-
-                    if(SHA256((u_char *) new2, strlen(new2), hash) == 0){
+                    //printf("t%d t%d %s\n", i + 1, j +1, new2);
+                    if(SHA256((u_char *) new2, strlen(new2), hash) == NULL){
                         printf("Erreur Update\n");
                         return 1;
                     }

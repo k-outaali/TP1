@@ -1,0 +1,16 @@
+t1 Secessioner
+t2 secessioneR
+t3 secessioner1
+t4 secessionersecessioner
+t1 t2 SecessioneR
+t1 t3 Secessioner1
+t1 t4 SecessionerSecessioner
+t2 t1 SecessioneR
+t2 t3 secessioneR1
+t2 t4 secessioneRsecessioneR
+t3 t1 Secessioner1
+t3 t2 secessioner
+t3 t4 secessioner1secessioner1
+t4 t1 Secessionersecessioner
+t4 t2 secessionersecessioneR
+t4 t3 secessionersecessioner1
