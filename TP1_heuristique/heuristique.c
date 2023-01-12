@@ -16,8 +16,11 @@ u_char hash4[HS]={106,76,233,133,75,101,137,140,40,158,113,14,229,79,187,203,104
 u_char hash5[HS]={204,82,170,71,151,42,43,203,171,255,86,120,21,187,141,182,250,163,78,230,231,172,14,80,113,59,87,212,133,172,76,148};
 u_char hash6[HS]={77,164,88,120,143,161,91,139,204,142,176,218,67,31,210,48,45,205,25,200,202,124,14,206,21,2,78,100,70,41,225,171};
 int found;
-
+char *str, *new, *new2;
 typedef int (*transf_t)(char *, char *, int);
+transf_t t[MAX_Ts];
+u_char hash[HS];
+int a[] = {0, 1, 2, 3};
 
 void print_hash_hex(u_char* md, int size){
 
@@ -96,7 +99,7 @@ int cmp(u_char *c1, u_char *c2){
     return 0;
 }
 
-int witch_hash(u_char *hash, char *str){
+int witch_hash(char *str){
     if((cmp(hash, hash1) == 0)){
         printf("hash1 => %s\n", str);
         found++;
@@ -105,19 +108,19 @@ int witch_hash(u_char *hash, char *str){
         printf("hash2 => %s\n", str);
         found++;
     }
-    else if(cmp(hash, hash2) == 0){
+    else if(cmp(hash, hash3) == 0){
         printf("hash3 => %s\n", str);
         found++;
     }
-    else if(cmp(hash, hash2) == 0){
+    else if(cmp(hash, hash4) == 0){
         printf("hash4 => %s\n", str);
         found++;
     }
-    else if(cmp(hash, hash2) == 0){
+    else if(cmp(hash, hash5) == 0){
         printf("hash5 => %s\n", str);
         found++;
     }
-    else if(cmp(hash, hash2) == 0){
+    else if(cmp(hash, hash6) == 0){
         printf("hash6 => %s\n", str);
         found++;
     }
@@ -125,6 +128,36 @@ int witch_hash(u_char *hash, char *str){
         return 0;
     }
     return -1;
+}
+
+void swap(int *a, int *b){ 
+    int t = *a; 
+    *a = *b; 
+    *b = t; 
+}
+
+void run_permute(int *a, int i, int n) {
+   
+   if (i == (n-1)) {
+    t[a[0]](str, new, strlen(new) - 1);
+    t[a[1]](new, new2, strlen(new) -1 );
+    t[a[2]](new2, new, strlen(new) - 1);
+    t[a[3]](new, new2, strlen(new) - 1);
+    //printf("t%d t%d t%d t%d %s\n", a[0], a[1], a[2], a[3], new2);
+    SHA256((u_char *) new2, strlen(new2), hash);
+    if(witch_hash(new2) == 0){
+        return;
+    }
+
+
+   }
+   else {
+     for (int j = i; j < n; j++) {
+       swap(&a[i], &a[j]);
+       run_permute(a, i+1, n);
+       swap(&a[i], &a[j]);
+     }
+  }
 }
 
 int read_line(FILE *file, char *s) {
@@ -149,10 +182,7 @@ int read_line(FILE *file, char *s) {
 
 int main(int agc, void **argv){
 
-    transf_t t[MAX_Ts];
-    char *str, *new, *new2;
     FILE *f1;
-    u_char hash[HS];
 
     str = (char *) malloc(sizeof(char) * LEN);
     if(str == NULL){
@@ -169,39 +199,33 @@ int main(int agc, void **argv){
         printf("malloc failed\n");
         return 1;
     }
-    f1 = fopen("test.txt", "rb");
+    f1 = fopen("dico2.txt", "rb");
     if(f1 == NULL){
         printf("failed to open file1\n");
         return 1;
     }
     found = 0;
-    t[0] = t1; t[1] = t2; t[2] = t3; t[3] = t4;
+    t[0] = (transf_t) t1; t[1] = (transf_t) t2; t[2] = (transf_t) t3; t[3] = (transf_t) t4;
     int len = read_line(f1, str);
     while(len > 0){
-        // check without applying any Ts
-        if(SHA256((u_char *) str, strlen(str), hash) == NULL){
-            printf("error sha256\n");
-            return 1;
-        }
-        if(witch_hash(hash, new) == 0){
-            break;
-        }
+        
         // check applying 1 T 
         for(int i = 0; i < MAX_Ts; i++){
             if(t[i](str, new, len - 1) != 0){
                 printf("Error t%d\n", i + 1);
                 return 1;
             }
-            //printf("t%d %s\n", i + 1, new);
+            
             if(SHA256((u_char *) new, strlen(new), hash) == NULL){
                 printf("Erreur Update\n");
                 return 1;
             }
-            if(witch_hash(hash, new) == 0){
+            if(witch_hash(new) == 0){
                 break;
             }
         }
-        // check applying 2 T
+        
+        //check applying 2 T
         for(int i = 0; i < MAX_Ts; i++){
             if(t[i](str, new, len - 1) != 0){
                 printf("Error t%d\n", i + 1);
@@ -213,17 +237,20 @@ int main(int agc, void **argv){
                         printf("Error t%d\n", i + 1);
                         return 1;
                     }
-                    //printf("t%d t%d %s\n", i + 1, j +1, new2);
+                    
                     if(SHA256((u_char *) new2, strlen(new2), hash) == NULL){
                         printf("Erreur Update\n");
                         return 1;
                     }
-                    if(witch_hash(hash, new2) == 0){
+                    if(witch_hash(new2) == 0){
                         break;
                     }
                 }    
-            }
+            } 
         }
+
+        //check applying 4 T
+        run_permute(a, 0, 5);
         if(memset(str, '\0', LEN) == NULL){
             printf("memset failed\n");
             return 1;
