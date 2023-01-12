@@ -61,16 +61,16 @@ int witch_hash(u_char *hash, char *str){
     if((cmp(hash, hash1) == 0)){
         printf("hash1 => %s\n", str);
         found++;
+        return 0;
     }
     else if(cmp(hash, hash2) == 0){
         printf("hash2 => %s\n", str);
         found++;
+        return 0;
     }
     else if(cmp(hash, hash3) == 0){
         printf("hash3 => %s\n", str);
         found++;
-    }
-    if(found == 3){
         return 0;
     }
     return -1;
