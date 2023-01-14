@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <openssl/evp.h>
 #include <errno.h>
+#include <signal.h>
 #include <string.h>
 
 #define DES_BLOCK_SIZE 8
@@ -11,6 +12,11 @@ void char_table_to_hex_string(u_char *table, char *hex_str, int table_size) {
     for (i = 0; i < table_size; i++) {
         sprintf(hex_str + (i * 2), "%02x", table[i]);
     }
+}
+
+void sig_handler(int sig){
+    
+    exit(1);
 }
 
 int main(){
@@ -46,7 +52,7 @@ int main(){
         EVP_DecryptInit(dec, EVP_des_cbc(), key2, NULL); 
         EVP_CIPHER_CTX_set_padding(dec, 0);
 
-        if (EVP_DecryptUpdate(dec, deciphered, &outl, check_result, DES_BLOCK_SIZE) == 0){
+        if (EVP_DecryptUpdate(dec, deciphered, &outl, double_ciphered, DES_BLOCK_SIZE) == 0){
             printf("ERROR decRYPTING\n");
             goto exit;
         }
@@ -65,7 +71,9 @@ int main(){
 
         for(ushort j = 0; j < USHRT_MAX; j++){
 
-            fread(line, 1, 34, f);
+            if(fread(line, 1, 34, f) != 34){
+                break;
+            }
             strncpy(stored_cipher, line, 16);
             if(strcmp(stored_cipher, str_deciphered) == 0){
                 printf("found key2=%s key1=%s", str_key2, line + 17);
@@ -73,6 +81,7 @@ int main(){
             }
             memset(line, '\0', DES_BLOCK_SIZE * DES_BLOCK_SIZE);
         }
+        rewind(f);
         
     }
 exit:

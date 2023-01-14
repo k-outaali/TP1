@@ -43,9 +43,9 @@ int main(){
 
         //printf("%x %x %x\n", key1[6], key1[7], j );
         EVP_EncryptInit(enc, EVP_des_cbc(), key1, NULL); 
-        EVP_CIPHER_CTX_set_padding(enc, 1);
+        EVP_CIPHER_CTX_set_padding(enc, 0);
 
-        if (EVP_EncryptUpdate(enc, ciphered, &outl, check_plaintext, DES_BLOCK_SIZE) ==0){
+        if (EVP_EncryptUpdate(enc, ciphered, &outl, plaintext, DES_BLOCK_SIZE) ==0){
             printf("ERROR ENCRYPTING\n");
             EVP_CIPHER_CTX_free(enc);
             return EXIT_FAILURE;
