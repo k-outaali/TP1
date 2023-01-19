@@ -14,11 +14,6 @@ void char_table_to_hex_string(u_char *table, char *hex_str, int table_size) {
     }
 }
 
-void sig_handler(int sig){
-    
-    exit(1);
-}
-
 int main(){
     u_char double_ciphered[8]={0x4a, 0xf4, 0xef, 0x60, 0xc0, 0x11, 0x71, 0x07};
     u_char plaintext[8] = {0x3e, 0x9a, 0x3e, 0x26, 0x5d, 0xcb, 0x6b, 0xa7};
@@ -77,7 +72,7 @@ int main(){
             strncpy(stored_cipher, line, 16);
             if(strcmp(stored_cipher, str_deciphered) == 0){
                 printf("found key2=%s key1=%s", str_key2, line + 17);
-                goto exit;
+                
             }
             memset(line, '\0', DES_BLOCK_SIZE * DES_BLOCK_SIZE);
         }

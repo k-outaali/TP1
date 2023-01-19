@@ -77,9 +77,9 @@ int main(){
     
    printf("OG MSG: %s\n", deciphered2);
 
-    EVP_DecryptInit(enc1, EVP_des_cbc(), key1, NULL); 
+    EVP_EncryptInit(enc1, EVP_des_cbc(), key1, NULL); 
     EVP_CIPHER_CTX_set_padding(enc1, 0);
-    EVP_DecryptInit(enc2, EVP_des_cbc(), key2, NULL); 
+    EVP_EncryptInit(enc2, EVP_des_cbc(), key2, NULL); 
     EVP_CIPHER_CTX_set_padding(enc2, 0);
 
     if (EVP_EncryptUpdate(enc1, ciphered1, &outl, check_plaintext, DES_BLOCK_SIZE) == 0){
